@@ -1,16 +1,18 @@
 
-#include "../includes/IcmpPoller.h"
+#include "IcmpPoller.h"
 
 		IcmpPoller::IcmpPoller(t_vs const &hosts, double timeout) :
 				Poller(timeout, hosts), _ping(ping_construct())
 {
+	for (std::string const &host : this->m_hosts)
+		ping_host_add(this->_ping, host.c_str());
     ping_setopt(_ping, PING_OPT_TIMEOUT, &m_timeout);
 }
 
-void IcmpPoller::Poll()
+void IcmpPoller::Poll(void)
 {
-    while(true)
-   {
+	while(true)
+	{
 		ping_send(_ping);
 		pingobj_iter_t *_iter;
 		for (_iter = ping_iterator_get(_ping);
@@ -31,24 +33,30 @@ void IcmpPoller::Poll()
     }
 }
 
-void IcmpPoller::UpdatePoller(std::vector<std::string> hosts, double timeout) {
-    for(auto it = m_hosts.begin(); it != m_hosts.end(); ) {
+void IcmpPoller::UpdatePoller(t_vs hosts, double timeout)
+{
+    for(auto it = m_hosts.begin(); it != m_hosts.end(); )
+    {
         auto found = std::find(hosts.begin(), hosts.end(), *it);
-        if(found == hosts.end()) {
+        if(found == hosts.end())
+        {
             ping_host_remove(_ping, it->c_str());
             m_hosts.erase(it);
 
         }
-        else {
+        else
+        {
             ++it;
             hosts.erase(found);
         }
     }
-    for (std::string host : hosts) {
+    for (std::string host : hosts)
+    {
         ping_host_add(_ping, host.c_str());
         m_hosts.push_back(host);
     }
-    if(timeout != m_timeout) {
+    if(timeout != m_timeout)
+    {
         m_timeout = timeout;
         ping_setopt(_ping, PING_OPT_TIMEOUT, &m_timeout);
     }

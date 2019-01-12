@@ -10,5 +10,5 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
 
 add_executable(testTask srcs/main.cpp includes/Poller.h srcs/IcmpPoller.cpp includes/IcmpPoller.h)
 
-target_include_directories(testTask PRIVATE ${JSONCPP_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_include_directories(testTask PRIVATE ${JSONCPP_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/includes)
 target_link_libraries(testTask ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES} oping pthread)

@@ -4,15 +4,16 @@
 #include "Poller.h"
 #include <oping.h>
 
-class IcmpPoller : public Poller {
+class IcmpPoller : public Poller
+{
 public:
     			IcmpPoller(t_vs const &hosts, double timeout);
     			~IcmpPoller(void) {ping_destroy(this->_ping);}
-    void Poll();
-    void UpdatePoller(std::vector<std::string> hosts, double timeout);
+    void		Poll(void) override;
+    void		UpdatePoller(std::vector<std::string> hosts, double timeout) override;
 
 private:
-    pingobj_t * _ping;
+    pingobj_t*	_ping;
 };
 
 
