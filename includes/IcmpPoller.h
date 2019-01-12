@@ -1,20 +1,16 @@
-#ifndef TESTTASK_ICMPPOLLER_H
-#define TESTTASK_ICMPPOLLER_H
+#pragma once
 
 #include "Poller.h"
-#include <oping.h>
+#include "Ping.class.h"
 
 class IcmpPoller : public Poller
 {
 public:
     			IcmpPoller(t_vs const &hosts, double timeout);
-    			~IcmpPoller(void) {ping_destroy(this->_ping);}
+    			~IcmpPoller(void);
     void		Poll(void) override;
-    void		UpdatePoller(std::vector<std::string> hosts, double timeout) override;
+    void		UpdatePoller(t_vs hosts, double timeout) override;
 
 private:
-    pingobj_t*	_ping;
+    Ping		*_ping;
 };
-
-
-#endif //TESTTASK_ICMPPOLLER_H

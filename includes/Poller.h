@@ -1,5 +1,4 @@
-#ifndef TESTTASK_POLLER_H
-#define TESTTASK_POLLER_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -24,6 +23,3 @@ protected:
     double			m_timeout;
     t_vs			m_hosts;
 };
-
-
-#endif //TESTTASK_POLLER_H

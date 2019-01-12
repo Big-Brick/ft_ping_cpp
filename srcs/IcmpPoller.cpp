@@ -1,33 +1,10 @@
-
 #include "IcmpPoller.h"
-
-		IcmpPoller::IcmpPoller(t_vs const &hosts, double timeout) :
-				Poller(timeout, hosts), _ping(ping_construct())
-{
-	for (std::string const &host : this->m_hosts)
-		ping_host_add(this->_ping, host.c_str());
-    ping_setopt(_ping, PING_OPT_TIMEOUT, &m_timeout);
-}
 
 void IcmpPoller::Poll(void)
 {
 	while(true)
 	{
-		ping_send(_ping);
-		pingobj_iter_t *_iter;
-		for (_iter = ping_iterator_get(_ping);
-			_iter != NULL; _iter = ping_iterator_next(_iter))
-		{
-			char temphostname[100];
-			double latency;
-			long unsigned int len;
-			len = 100;
-			ping_iterator_get_info(_iter, PING_INFO_HOSTNAME, temphostname,
-									&len);
-			len = sizeof(double);
-			ping_iterator_get_info(_iter, PING_INFO_LATENCY, &latency, &len);
-			std::cout << temphostname << " - " << latency << std::endl;
-		}
+		this->_ping->sendPing();
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		std::cout << "--------------------------------------------------" << std::endl;
     }
@@ -35,12 +12,14 @@ void IcmpPoller::Poll(void)
 
 void IcmpPoller::UpdatePoller(t_vs hosts, double timeout)
 {
+	t_vs	hostsToRemove;
+
     for(auto it = m_hosts.begin(); it != m_hosts.end(); )
     {
         auto found = std::find(hosts.begin(), hosts.end(), *it);
         if(found == hosts.end())
         {
-            ping_host_remove(_ping, it->c_str());
+        	hostsToRemove.push_back(*it);
             m_hosts.erase(it);
 
         }
@@ -50,14 +29,13 @@ void IcmpPoller::UpdatePoller(t_vs hosts, double timeout)
             hosts.erase(found);
         }
     }
+    this->_ping->addHosts(hosts);
+    this->_ping->removeHosts(hostsToRemove);
     for (std::string host : hosts)
-    {
-        ping_host_add(_ping, host.c_str());
         m_hosts.push_back(host);
-    }
     if(timeout != m_timeout)
     {
         m_timeout = timeout;
-        ping_setopt(_ping, PING_OPT_TIMEOUT, &m_timeout);
+        this->_ping->setTimeout(timeout);
     }
 }
